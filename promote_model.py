@@ -3,42 +3,43 @@ import dagshub
 import json
 from mlflow import MlflowClient
 
-import dagshub
+# Initialize Dagshub and MLflow
 dagshub.init(repo_owner='tushar-oclock', repo_name='uber-demand-prediction', mlflow=True)
-
-# set the mlflow tracking uri
 mlflow.set_tracking_uri("https://dagshub.com/tushar-oclock/uber-demand-prediction.mlflow")
 
-
-def load_model_information(file_path):
-    with open(file_path) as f:
-        run_info = json.load(f)
-        
-    return run_info
-
-
-# get model name
+# Model metadata
 registered_model_name = 'uber_demand_prediction_model'
 stage = "Staging"
-
-# get the latest version from staging stage
-client = MlflowClient()
-
-# get the latest version of model in staging
-latest_versions = client.get_latest_versions(name=registered_model_name,stages=[stage])
-latest_model_version_staging = latest_versions[0].version
-
-# promotion stage
 promotion_stage = "Production"
 
+# Initialize MLflow client
+client = MlflowClient()
+
+# Get latest version in staging
+latest_versions = client.get_latest_versions(name=registered_model_name, stages=[stage])
+
+# Check if staging model exists
+if not latest_versions:
+    print(f"No model found in '{stage}' stage for model '{registered_model_name}'.")
+    # Optional: list all available versions and their stages
+    all_versions = client.get_latest_versions(name=registered_model_name)
+    if all_versions:
+        print("Available model versions:")
+        for v in all_versions:
+            print(f" - Version {v.version} in stage '{v.current_stage}'")
+    else:
+        print("No versions found at all for this model.")
+    exit(1)
+
+# Promote model to production
+latest_model_version_staging = latest_versions[0].version
+
 model_version_prod = client.transition_model_version_stage(
-                                                        name=registered_model_name,
-                                                        version=latest_model_version_staging,
-                                                        stage=promotion_stage,
-                                                        archive_existing_versions=True
-                                                    )
+    name=registered_model_name,
+    version=latest_model_version_staging,
+    stage=promotion_stage,
+    archive_existing_versions=True
+)
 
-production_version = model_version_prod.version
-new_stage = model_version_prod.current_stage
-
-print(f"The model is moved to the {new_stage} stage having version number {production_version}")
+# Output result
+print(f"The model is moved to the {model_version_prod.current_stage} stage with version number {model_version_prod.version}")
