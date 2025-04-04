@@ -13,7 +13,7 @@ from time import sleep
 set_config(transform_output="pandas")
 
 import dagshub
-dagshub.init(repo_owner='himanshu1703', repo_name='uber-demand-prediction', mlflow=True)
+dagshub.init(repo_owner='tushar-oclock', repo_name='uber-demand-prediction', mlflow=True)
 
 # set the mlflow tracking uri
 mlflow.set_tracking_uri("https://dagshub.com/tushar-oclock/uber-demand-prediction.mlflow")
