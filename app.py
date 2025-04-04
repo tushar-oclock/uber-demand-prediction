@@ -16,7 +16,7 @@ import dagshub
 dagshub.init(repo_owner='himanshu1703', repo_name='uber-demand-prediction', mlflow=True)
 
 # set the mlflow tracking uri
-mlflow.set_tracking_uri("https://dagshub.com/himanshu1703/uber-demand-prediction.mlflow")
+mlflow.set_tracking_uri("https://dagshub.com/tushar-oclock/uber-demand-prediction.mlflow")
 
 # get model name
 registered_model_name = 'uber_demand_prediction_model'
